@@ -7,6 +7,10 @@
 <body>
     SocketIO
 
+    <div id="msgs">
+
+    </div>
+
     <form id="message-form">
         <input type="text" id="message" placeholder="message">
         <button id="send">Send</button>
@@ -14,6 +18,15 @@
 
     <button id="send-location">Send location</button>
 
+    <script id="msg-template" type="text/html">
+            <div>
+                <p>{{message}}</p>
+            </div>
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.0.1/mustache.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.6.0/qs.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/chat.js"></script>
 </body>
