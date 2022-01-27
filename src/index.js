@@ -36,13 +36,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('message', `Location: ${coords.latitude}, ${coords.longitude}`);
+        io.emit('locationMessage', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`);
 
         if (callback) {
             callback();
         }
     });
-
     socket.on('disconnect', () => {
         io.emit('message', 'User disconnected');
     });
