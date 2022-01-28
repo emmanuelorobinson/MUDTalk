@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const Filter = require('bad-words');
+const {generateMessage, generateLocationMessage} = require('./utils/messages');
 
 const app = express();
 const server = http.createServer(app);
@@ -17,8 +18,8 @@ app.use(express.static(pathToPublic));
 io.on('connection', (socket) => {
     console.log('New user connected');
 
-    socket.emit('message', 'Welcome!')
-    socket.broadcast.emit('message', 'New user joined')
+    socket.emit('message', generateMessage('Admin', 'Welcome to the chat app'));
+    socket.broadcast.emit('message', generateMessage('Admin', 'New user joined'));
 
     socket.on('sendMessage', (message, callback) => {
         const filter = new Filter();
@@ -27,7 +28,7 @@ io.on('connection', (socket) => {
             return callback('Profanity is not allowed');
         }
 
-        io.emit('message', message);
+        io.emit('message', generateMessage(undefined, message));
 
         if (callback) {
             callback();
@@ -36,14 +37,14 @@ io.on('connection', (socket) => {
     });
 
     socket.on('sendLocation', (coords, callback) => {
-        io.emit('locationMessage', `https://google.com/maps?q=${coords.latitude},${coords.longitude}`);
+        io.emit('locationMessage', generateLocationMessage(undefined, `https://google.com/maps?q=${coords.latitude},${coords.longitude}`));
 
         if (callback) {
             callback();
         }
     });
     socket.on('disconnect', () => {
-        io.emit('message', 'User disconnected');
+        io.emit('message', generateMessage('Admin', 'User left'));
     });
 
 });
