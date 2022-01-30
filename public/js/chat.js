@@ -12,6 +12,9 @@ const msgTemplate = document.querySelector('#msg-template').innerHTML;
 const locTemplate = document.querySelector('#loc-template').innerHTML;
 
 
+//Options
+const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
+
 socket.on('message', (message) => {
     console.log(message);
 
@@ -76,4 +79,11 @@ $sendLoc.addEventListener('click', () => {
         });
         $sendLoc.removeAttribute('disabled');
     });
+});
+
+socket.emit('join', { username, room }, (error) => {
+    if (error) {
+        alert(error);
+        location.href = '/';
+    }
 });
