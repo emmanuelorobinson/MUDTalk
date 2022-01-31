@@ -1,5 +1,3 @@
-const { get } = require("express/lib/response");
-
 const socket = io();
 
 const btn = document.getElementById('add');
