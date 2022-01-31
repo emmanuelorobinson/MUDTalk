@@ -1,3 +1,5 @@
+const { get } = require("express/lib/response");
+
 const socket = io();
 
 const btn = document.getElementById('add');
@@ -10,19 +12,38 @@ const $messages = document.querySelector('#msgs');
 //Templates
 const msgTemplate = document.querySelector('#msg-template').innerHTML;
 const locTemplate = document.querySelector('#loc-template').innerHTML;
+const sidebarTemplate = document.querySelector('#sidebar-template').innerHTML;
 
 
 //Options
 const { username, room } = Qs.parse(location.search, { ignoreQueryPrefix: true });
 
+const autoscroll = () => {
+    const $newMessage = $messages.lastElementChild
+
+    const newMessageStyles = getComputedStyle($newMessage);
+    const newMessageMargin = parseInt(newMessageStyles.marginBottom)
+    const newMessgeHeight = $newMessage.offsetHeight + newMessageMargin;
+
+    const visibleHeight = $messages.offsetHeight;
+    const containerHeight = $messages.scrollHeight;
+    const scrollOffset = $messages.scrollTop + visibleHeight;
+    
+    if (containerHeight - newMessgeHeight <= scrollOffset) {
+        $messages.scrollTop = $messages.scrollHeight;
+    }
+}
+
 socket.on('message', (message) => {
     console.log(message);
 
     const html = Mustache.render(msgTemplate, {
+        username: message.username,
         message: message.text,
         createdAt: moment(message.createdAt).format('h:mm a'),
     });
     $messages.insertAdjacentHTML('beforeend', html);
+    autoscroll();
 
 });
 
@@ -30,11 +51,21 @@ socket.on('locationMessage', (url) => {
     console.log(url);
 
     const html = Mustache.render(locTemplate, {
+        username: url.username,
         url: url.text,
         createdAt: moment(url.createdAt).format('h:mm a'),
     });
 
     $messages.insertAdjacentHTML('beforeend', html);
+    autoscroll();
+});
+
+socket.on('roomData', ({ room, users }) => {
+    const html = Mustache.render(sidebarTemplate, {
+        room,
+        users
+    })
+    document.getElementById('sidebar').innerHTML = html;
 });
 
 $msgForm.addEventListener('submit', (e) => {
